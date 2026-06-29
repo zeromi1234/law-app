@@ -1,65 +1,167 @@
-import Image from "next/image";
+import Link from 'next/link'
+import Image from 'next/image'
+import { laws } from '@/lib/mock-data'
+
+const features = [
+  {
+    href: '/check',
+    icon: '🔍',
+    title: '위험도 체크',
+    desc: '주소·보증금·근저당 입력으로 내 전세 위험도를 바로 확인',
+  },
+  {
+    href: '/checklist',
+    icon: '✅',
+    title: '계약전 확인',
+    desc: '계약 전부터 입주 후까지 놓치면 안 되는 5단계 체크리스트',
+  },
+  {
+    href: '/calculator',
+    icon: '🧮',
+    title: '보험 계산기',
+    desc: '전세보증보험 가입 가능 여부와 예상 보험료를 계산',
+  },
+  {
+    href: '/cases',
+    icon: '⚠️',
+    title: '피해 사례',
+    desc: '깡통전세·신탁사기·이중계약 등 실제 피해 사례 모음',
+  },
+  {
+    href: '/support',
+    icon: '🆘',
+    title: '피해 대처',
+    desc: '피해를 입었다면? 즉시 해야 할 6단계 대처 방법',
+  },
+  {
+    href: '/contract',
+    icon: '📄',
+    title: '계약서 분석',
+    desc: '독소조항과 안전 특약, 계약서에서 꼭 확인해야 할 것들',
+  },
+  {
+    href: '/counsel',
+    icon: '📞',
+    title: '상담 연결',
+    desc: '법률·주거·보증 전문 상담기관 바로 연결',
+  },
+  {
+    href: '/law',
+    icon: '⚖️',
+    title: '법률 정보',
+    desc: '전세 계약 관련 핵심 법률 18가지 한눈에 보기',
+  },
+]
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="space-y-14">
+      {/* 히어로 */}
+      <section className="rounded-3xl bg-black text-white p-8 sm:p-14 flex flex-col sm:flex-row items-center gap-8">
+        <div className="flex-1 space-y-4">
+          <p className="text-gray-400 text-sm font-medium tracking-widest uppercase">전세사기 예방 서비스</p>
+          <h1 className="text-3xl sm:text-5xl font-black leading-tight">
+            우리집,<br />과연 안전할까?
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+          <p className="text-gray-400 text-base leading-relaxed">
+            집터뷰와 함께 안전한 집 찾기
+          </p>
+          <div className="flex gap-3 pt-2 flex-wrap">
+            <Link href="/check" className="bg-white text-black font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors text-sm">
+              내 집 체크하기
+            </Link>
+            <Link href="/checklist" className="border border-gray-700 text-white font-medium px-6 py-3 rounded-full hover:border-gray-500 transition-colors text-sm">
+              계약전 확인
+            </Link>
+          </div>
+        </div>
+        <Image src="/logo.png" alt="집터뷰" width={160} height={160} className="invert opacity-90" />
+      </section>
+
+      {/* 기능 바로가기 */}
+      <section>
+        <h2 className="text-xl font-black mb-5">집터뷰가 도와드릴게요</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {features.map((f) => (
+            <Link
+              key={f.href}
+              href={f.href}
+              className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-300 transition-all group"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              <span className="text-2xl">{f.icon}</span>
+              <h3 className="font-black text-sm mt-3 group-hover:underline">{f.title}</h3>
+              <p className="text-xs text-gray-400 mt-1 leading-relaxed">{f.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 계약전 확인 배너 */}
+      <section className="bg-black text-white rounded-3xl p-8 flex flex-row items-center justify-between gap-6">
+        <div>
+          <p className="text-xs text-gray-400 font-medium mb-2">계약 전 필수</p>
+          <h2 className="text-xl sm:text-2xl font-black">이사갈 집 안전한지 체크하자!</h2>
+          <p className="text-gray-400 text-sm mt-2 leading-relaxed">
+            전세사기 피해를 방지하기 위해 지금 바로 체크해보세요.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link
+          href="/checklist"
+          className="shrink-0 bg-white text-black font-black px-5 py-3 rounded-full hover:bg-gray-100 transition-colors text-sm whitespace-nowrap"
+        >
+          시작하기 →
+        </Link>
+      </section>
+
+      {/* 밸런스 게임 배너 */}
+      <section>
+        <Link
+          href="/balance"
+          className="block bg-white border border-gray-100 rounded-3xl p-8 hover:shadow-md transition-shadow group"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-black text-white text-xs font-bold px-3 py-1 rounded-full">NEW</span>
+                <span className="text-xs text-gray-400 font-medium">전세 지식 테스트</span>
+              </div>
+              <h2 className="text-xl font-black">전세 밸런스 게임</h2>
+              <p className="text-sm text-gray-500">
+                나는 전세 계약에 대해 얼마나 알고 있을까?<br />
+                8문제로 내 전세 지식 레벨을 확인해봐요
+              </p>
+            </div>
+            <span className="shrink-0 bg-black text-white font-black px-5 py-3 rounded-full text-sm whitespace-nowrap">
+              게임하러가기 →
+            </span>
+          </div>
+        </Link>
+      </section>
+
+      {/* 법률 정보 미리보기 */}
+      <section>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-xl font-black">꼭 알아야 할 부동산 법률</h2>
+          <Link href="/law" className="text-sm text-gray-400 hover:text-black transition-colors">
+            전체보기 →
+          </Link>
         </div>
-      </main>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {laws.slice(0, 4).map((law) => (
+            <Link
+              key={law.id}
+              href={`/law/${law.id}`}
+              className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-sm transition-shadow group"
+            >
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+                {law.category}
+              </span>
+              <h3 className="font-bold mt-2 text-sm group-hover:underline">{law.title}</h3>
+              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{law.summary}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
-  );
+  )
 }
