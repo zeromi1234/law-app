@@ -61,7 +61,7 @@ export default function Home() {
         <div className="flex flex-row items-center gap-6 mb-6">
           <div className="flex-1 space-y-4 min-w-0">
             <p className="text-gray-400 text-xs sm:text-sm font-medium tracking-widest uppercase">전세사기 예방 서비스</p>
-            <h1 className="text-3xl sm:text-5xl font-black leading-tight">
+            <h1 className="text-[1.6rem] sm:text-5xl font-black leading-tight">
               이집<span className="text-xl sm:text-3xl">..</span><br />과연 안전할까?
             </h1>
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
