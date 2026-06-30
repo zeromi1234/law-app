@@ -19,7 +19,7 @@ const groups = [
     items: [
       { href: '/cases', label: '피해 사례' },
       { href: '/support', label: '피해 대처' },
-      { href: '/counsel', label: '상담 연결' },
+      { href: '/counsel', label: '전문가 상담 연결' },
     ],
   },
   {
@@ -90,7 +90,11 @@ export default function Header() {
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* 로고 + 데스크탑 GNB */}
         <div className="flex items-center" style={{ gap: '40px' }}>
-          <Link href="/" className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/"
+            onClick={e => { if (pathname === '/') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) } }}
+            className="flex items-center gap-2 shrink-0"
+          >
             <Image src="/logo.png" alt="집터뷰" width={36} height={36} />
             <span className="text-lg font-black text-black tracking-tight">집터뷰</span>
           </Link>
@@ -103,10 +107,16 @@ export default function Header() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/check"
+            href="/about"
+            className="hidden sm:block text-sm text-gray-400 hover:text-black transition-colors"
+          >
+            왜 만들었나요?
+          </Link>
+          <Link
+            href="/counsel"
             className="hidden sm:block bg-black text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
           >
-            내 집 체크하기
+            무료 상담 받기
           </Link>
           {/* 햄버거 버튼 */}
           <button
@@ -193,12 +203,18 @@ export default function Header() {
         </div>
 
         {/* 드로어 하단 버튼 */}
-        <div className="px-4 py-5 border-t border-gray-100">
+        <div className="px-4 py-5 border-t border-gray-100 space-y-2">
           <Link
-            href="/check"
+            href="/about"
+            className="block text-center text-sm text-gray-400 py-2"
+          >
+            왜 만들었나요?
+          </Link>
+          <Link
+            href="/counsel"
             className="block bg-black text-white text-sm font-bold px-4 py-3 rounded-2xl text-center"
           >
-            내 집 체크하기
+            무료 상담 받기
           </Link>
         </div>
       </div>

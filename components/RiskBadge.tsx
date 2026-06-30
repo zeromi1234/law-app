@@ -16,10 +16,10 @@ export default function RiskBadge({ level, size = 'sm' }: { level: RiskLevel; si
   return (
     <span
       className={`inline-flex items-center gap-1 font-bold rounded-full ${styles[level]} ${
-        size === 'lg' ? 'text-base px-4 py-2' : 'text-xs px-2.5 py-1'
+        size === 'lg' ? 'text-sm px-3 py-1.5' : 'text-xs px-2.5 py-1'
       }`}
     >
-      {icons[level]} {level}
+      {level} {icons[level]}
     </span>
   )
 }

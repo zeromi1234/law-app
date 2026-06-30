@@ -191,7 +191,7 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <Link href="/checklist" className="block text-center border border-gray-200 text-gray-700 font-bold py-4 rounded-2xl hover:bg-gray-50 transition-colors">
+      <Link href="/checklist" className="block text-center bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 transition-colors">
         계약 전 체크리스트 보기
       </Link>
     </div>

@@ -177,3 +177,54 @@ export function downloadChecklist(checked: Record<string, boolean>) {
   win.document.write(html)
   win.document.close()
 }
+
+export async function downloadChecklistAsJpg(checked: Record<string, boolean>) {
+  const logoUrl = `${window.location.origin}/logo.png`
+  const div = document.createElement('div')
+  div.style.cssText = 'position:fixed;left:-9999px;top:0;width:600px;background:#fff;padding:40px;font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;'
+
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;border-bottom:2px solid #000;padding-bottom:14px;margin-bottom:20px;">
+      <img src="${logoUrl}" style="width:36px;height:36px;" />
+      <span style="font-size:20px;font-weight:900;">집터뷰</span>
+    </div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">전세 계약 전 체크리스트</div>
+    <div style="font-size:9px;color:#888;margin-bottom:20px;">전세사기 예방을 위한 단계별 확인 항목</div>
+    ${steps.map(s => `
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;">${s.step}</div>
+          <div style="font-size:11px;font-weight:800;">${s.title}</div>
+        </div>
+        ${s.items.map((item, i) => {
+          const key = `${s.step}-${i}`
+          const isChecked = !!checked[key]
+          return `
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-left:28px;margin-bottom:6px;">
+            <div style="width:12px;height:12px;border:1.5px solid #000;border-radius:2px;flex-shrink:0;margin-top:1px;background:${isChecked ? '#000' : '#fff'};display:flex;align-items:center;justify-content:center;">
+              ${isChecked ? '<span style="color:#fff;font-size:8px;line-height:1;">v</span>' : ''}
+            </div>
+            <span style="font-size:9.5px;line-height:1.55;color:${isChecked ? '#aaa' : '#333'};text-decoration:${isChecked ? 'line-through' : 'none'};">${item}</span>
+          </div>`
+        }).join('')}
+      </div>
+    `).join('')}
+    <div style="border-top:1px solid #eee;padding-top:10px;display:flex;justify-content:space-between;font-size:8px;color:#aaa;margin-top:10px;">
+      <span>집터뷰 — 전세사기 예방 서비스</span>
+      <span>본 문서는 참고용이며 법적 효력이 없습니다.</span>
+    </div>
+  `
+
+  document.body.appendChild(div)
+
+  try {
+    const domtoimage = (await import('dom-to-image-more')).default
+    const dataUrl = await domtoimage.toJpeg(div, { quality: 0.95, bgcolor: '#ffffff', scale: 2 })
+    const link = document.createElement('a')
+    link.download = `집터뷰_체크리스트_${new Date().toLocaleDateString('ko-KR').replace(/\. /g, '-').replace('.', '')}.jpg`
+    link.href = dataUrl
+    link.click()
+  } finally {
+    document.body.removeChild(div)
+  }
+}

@@ -1,4 +1,6 @@
+import { Fragment } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const counselors = [
   {
@@ -104,45 +106,91 @@ export default function CounselPage() {
         </a>
       </div>
 
-      {counselors.map((group) => (
-        <section key={group.category} className="space-y-3">
-          <h2 className="font-black text-lg">{group.category}</h2>
-          {group.items.map((item) => (
-            <div key={item.name} className="bg-white rounded-2xl border border-gray-100 p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-sm">{item.name}</span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                      item.badge === '24시간' ? 'bg-black text-white' : 'bg-green-50 text-green-600'
-                    }`}>
-                      {item.badge}
-                    </span>
+      {counselors.map((group, idx) => (
+        <Fragment key={group.category}>
+          <section className="space-y-3">
+            <h2 className="font-black text-lg">{group.category}</h2>
+            {group.items.map((item) => (
+              <div key={item.name} className="bg-white rounded-2xl border border-gray-100 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-sm">{item.name}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        item.badge === '24시간' ? 'bg-black text-white' : 'bg-green-50 text-green-600'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-2">{item.hours}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
                   </div>
-                  <p className="text-xs text-gray-400 mb-2">{item.hours}</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <a href={`tel:${item.tel}`}
+                    className="flex-1 bg-black text-white font-bold text-sm py-2.5 rounded-xl text-center hover:bg-gray-800 transition-colors">
+                    ☎ {item.tel}
+                  </a>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 border border-gray-200 text-gray-600 font-medium text-sm py-2.5 rounded-xl text-center hover:bg-gray-50 transition-colors">
+                    사이트 바로가기
+                  </a>
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <a
-                  href={`tel:${item.tel}`}
-                  className="flex-1 bg-black text-white font-bold text-sm py-2.5 rounded-xl text-center hover:bg-gray-800 transition-colors"
-                >
-                  ☎ {item.tel}
-                </a>
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 border border-gray-200 text-gray-600 font-medium text-sm py-2.5 rounded-xl text-center hover:bg-gray-50 transition-colors"
-                >
-                  사이트 바로가기
-                </a>
+            ))}
+          </section>
+
+          {idx === 0 && (
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-black text-lg">파트너 변호사 · 법무사</h2>
+                <p className="text-xs text-gray-400 mt-0.5">전세사기·부동산 분쟁 전문가를 직접 연결해드려요</p>
               </div>
-            </div>
-          ))}
-        </section>
+              {[
+                { name: '이지현', title: '변호사', firm: '법무법인 세이프홈', tags: ['전세사기 특화', '임차권등기', '당일 답변'], career: 11, rating: 4.9, reviews: 127 },
+                { name: '박성준', title: '변호사', firm: '박성준 법률사무소', tags: ['경매 전문', '깡통전세', '긴급상담 가능'], career: 15, rating: 4.8, reviews: 89 },
+                { name: '김민서', title: '법무사', firm: '민서 법무사 사무소', tags: ['임차권등기 전문', '비용 합리적', '수도권'], career: 8, rating: 4.7, reviews: 64 },
+              ].map((l) => (
+                <div key={l.name} className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                    <Image src="/lawyers/ex-person.png" alt={l.name} width={48} height={48} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-sm">{l.name} {l.title}</span>
+                      <span className="text-xs bg-black text-white px-2 py-0.5 rounded-full font-bold">파트너</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-0.5">{l.firm} · 경력 {l.career}년</p>
+                    <div className="flex gap-1 mt-1.5 flex-wrap">
+                      {l.tags.map(t => (
+                        <span key={t} className="text-xs bg-gray-50 border border-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <Link href="/lawyers" className="shrink-0 bg-black text-white text-xs font-bold px-3 py-2 rounded-xl hover:bg-gray-800 transition-colors">
+                    상담 신청
+                  </Link>
+                </div>
+              ))}
+              <Link href="/lawyers" className="block text-center text-sm text-gray-400 hover:text-black transition-colors">
+                파트너 변호사 전체보기 →
+              </Link>
+            </section>
+          )}
+        </Fragment>
       ))}
+
+      {/* 변호사 등록 배너 */}
+      <div className="border border-dashed border-gray-300 rounded-2xl p-6 text-center space-y-2">
+        <p className="font-black text-sm">부동산 전문 변호사·법무사이신가요?</p>
+        <p className="text-xs text-gray-400 leading-relaxed">전세사기 피해자와 연결되는 집터뷰 파트너로 등록하세요.<br />월 단위 간편 등재, 직접 문의로 시작할 수 있어요.</p>
+        <Link
+          href="mailto:zeromi.0924@gmail.com?subject=집터뷰 파트너 등재 문의"
+          className="inline-block mt-1 bg-black text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          파트너 등재 문의하기
+        </Link>
+      </div>
 
       <Link href="/support" className="block text-center border border-gray-200 text-gray-700 font-bold py-4 rounded-2xl hover:bg-gray-50 transition-colors">
         ← 피해 대처 방법 보기
