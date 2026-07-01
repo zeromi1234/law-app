@@ -126,7 +126,7 @@ export default function Home() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="bg-black text-white text-xs font-bold px-3 py-1 rounded-full">NEW</span>
-                <span className="text-xs text-gray-400 font-medium">전세 지식 테스트</span>
+                <span className="text-xs text-gray-400 font-medium whitespace-nowrap">전세 지식 테스트</span>
               </div>
               <h2 className="text-xl font-black">전세 밸런스 게임</h2>
               <p className="text-sm text-gray-500">

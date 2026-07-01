@@ -608,6 +608,10 @@ interface InterviewData {
   stage: Stage | null
   houseType: HouseType | null
   deposit: string
+  mortgage: string          // 근저당 금액 ('0'=없음, ''=미선택)
+  mortgageUnknown: boolean  // 아직 확인 안 했어요
+  hasSeizure: boolean | null
+  hasTax: boolean | null
   knowAddress: boolean | null
 }
 
@@ -687,9 +691,22 @@ function getCheckItems(data: InterviewData): CheckItem[] {
 
 function getRiskLevel(data: InterviewData): RiskLevel {
   const deposit = Number(data.deposit)
+  const mortgage = Number(data.mortgage) || 0
+  const isRiskyHouse = data.houseType === '빌라' || data.houseType === '다가구'
+
+  if (data.hasSeizure === true) return '위험'
+  if (data.hasTax === true) return '위험'
+
+  if (mortgage > 0 && deposit > 0) {
+    if (mortgage >= deposit) return '위험'
+    if (mortgage >= deposit * 0.5) return '경고'
+  }
+  if (data.mortgageUnknown) return '경고'
+
   if (data.stage === '잔금 전' && deposit > 30000) return '위험'
-  if (data.houseType === '빌라' || data.houseType === '다가구') return '경고'
-  if (data.stage === '계약금 입금 전') return '경고'
+  if (data.stage === '잔금 전' && isRiskyHouse && deposit > 10000) return '위험'
+  if (isRiskyHouse && deposit >= 10000) return '경고'
+  if (data.stage === '계약금 입금 전' && deposit >= 10000) return '경고'
   return '안전'
 }
 
@@ -701,9 +718,15 @@ function getRiskTitle(risk: RiskLevel, stage: Stage | null) {
 
 function getRiskReason(data: InterviewData, risk: RiskLevel): string {
   const deposit = Number(data.deposit)
+  const mortgage = Number(data.mortgage) || 0
+  if (data.hasSeizure === true) return '압류·가압류 이력이 있어요. 계약 전 반드시 법률 상담이 필요해요.'
+  if (data.hasTax === true) return '세금 체납은 보증금보다 우선 변제돼요. 전문가 상담을 받으세요.'
+  if (mortgage > 0 && mortgage >= deposit) return `근저당(${mortgage.toLocaleString()}만원)이 보증금 이상이에요. 경매 시 보증금 회수가 불가능할 수 있어요.`
+  if (mortgage > 0 && mortgage >= deposit * 0.5) return `근저당(${mortgage.toLocaleString()}만원) + 보증금 합산이 높아요. 전세가율을 꼭 확인하세요.`
+  if (data.mortgageUnknown) return '등기부등본을 아직 확인 안 하셨어요. 근저당 금액부터 확인하세요.'
   if (risk === '위험') return `잔금 전 ${deposit.toLocaleString()}만원 — 등기 상태가 바뀌기 전에 즉시 확인하세요.`
-  if (data.houseType === '빌라' || data.houseType === '다가구') return `${data.houseType}은 선순위 임차인·신탁 등기 위험이 있어 꼼꼼히 확인이 필요해요.`
-  if (data.stage === '계약금 입금 전') return `계약금 입금 후 잔금 전, 확정일자·전입신고 준비가 꼭 필요해요.`
+  if (data.houseType === '빌라' || data.houseType === '다가구') return `${data.houseType}은 선순위 임차인·신탁 등기 위험이 있어요.`
+  if (data.stage === '계약금 입금 전') return '계약금 입금 후 잔금 전, 확정일자·전입신고 준비가 꼭 필요해요.'
   return `아직 ${data.stage} 단계라 여유 있게 체크할 수 있어요.`
 }
 
@@ -714,15 +737,15 @@ function getAllQuestions(data: InterviewData): string[] {
 // ─── 인터뷰 컴포넌트 ────────────────────────────────────────────
 function InterviewTab({ onSwitchToCheck }: { onSwitchToCheck: () => void }) {
   const [step, setStep] = useState(0)
-  const [data, setData] = useState<InterviewData>({ stage: null, houseType: null, deposit: '', knowAddress: null })
+  const [data, setData] = useState<InterviewData>({ stage: null, houseType: null, deposit: '', mortgage: '', mortgageUnknown: false, hasSeizure: null, hasTax: null, knowAddress: null })
   const [done, setDone] = useState(false)
   const resultRef = useRef<HTMLDivElement>(null)
 
-  const totalSteps = 4
+  const totalSteps = 6
   const progress = Math.round((step / totalSteps) * 100)
 
   const next = () => setStep(s => s + 1)
-  const restart = () => { setDone(false); setStep(0); setData({ stage: null, houseType: null, deposit: '', knowAddress: null }) }
+  const restart = () => { setDone(false); setStep(0); setData({ stage: null, houseType: null, deposit: '', mortgage: '', mortgageUnknown: false, hasSeizure: null, hasTax: null, knowAddress: null }) }
   const back = () => setStep(s => Math.max(0, s - 1))
 
   const handleKnowAddress = (know: boolean) => {
@@ -792,15 +815,15 @@ function InterviewTab({ onSwitchToCheck }: { onSwitchToCheck: () => void }) {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={copyQuestions}
-            className="border border-gray-200 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-50 transition-colors text-sm"
+            className="border border-gray-200 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-50 transition-colors text-xs"
           >
-            📋 공인중개사 질문 복사하기
+            📋 질문 복사하기
           </button>
           <button
             onClick={saveAsJpg}
-            className="bg-black text-white font-bold py-3 rounded-2xl hover:bg-gray-800 transition-colors text-sm"
+            className="bg-black text-white font-bold py-3 rounded-2xl hover:bg-gray-800 transition-colors text-xs"
           >
-            📥 체크리스트 이미지로 저장하기
+            📥 이미지로 저장하기
           </button>
         </div>
       </div>
@@ -904,11 +927,105 @@ function InterviewTab({ onSwitchToCheck }: { onSwitchToCheck: () => void }) {
         </div>
       )}
 
-      {/* Step 3: 주소 아는지 */}
+      {/* Step 3: 근저당 */}
       {step === 3 && (
         <div className="space-y-4">
           <div>
             <p className="text-xs text-gray-400 font-medium mb-1">Step 4</p>
+            <h2 className="text-xl font-black">근저당이 설정돼 있나요?</h2>
+            <p className="text-sm text-gray-400 mt-1">등기부등본 을구에서 확인할 수 있어요</p>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => { setData(d => ({ ...d, mortgage: '0', mortgageUnknown: false })); next() }}
+              className="w-full flex items-center gap-4 bg-white border border-gray-100 rounded-2xl p-4 hover:border-black transition-colors text-left"
+            >
+              <span className="text-2xl">✅</span>
+              <div>
+                <p className="font-bold text-sm">없어요</p>
+                <p className="text-xs text-gray-400">등기부에 근저당 없음 확인했어요</p>
+              </div>
+            </button>
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-3">
+              <p className="font-bold text-sm">⚠️ 있어요 — 금액을 입력해주세요</p>
+              <input
+                type="number"
+                placeholder="근저당 금액 (만원) 예) 8000"
+                value={data.mortgage === '0' || data.mortgageUnknown ? '' : data.mortgage}
+                onChange={e => setData(d => ({ ...d, mortgage: e.target.value, mortgageUnknown: false }))}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {data.mortgage && data.mortgage !== '0' && !data.mortgageUnknown && (
+                <button
+                  onClick={next}
+                  className="w-full bg-black text-white font-bold py-3 rounded-xl text-sm hover:bg-gray-800 transition-colors"
+                >
+                  다음
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => { setData(d => ({ ...d, mortgage: '', mortgageUnknown: true })); next() }}
+              className="w-full flex items-center gap-4 bg-white border border-gray-100 rounded-2xl p-4 hover:border-black transition-colors text-left"
+            >
+              <span className="text-2xl">🔍</span>
+              <div>
+                <p className="font-bold text-sm">아직 확인 안 했어요</p>
+                <p className="text-xs text-gray-400">등기부등본을 아직 안 뽑았어요</p>
+              </div>
+            </button>
+          </div>
+          <button onClick={back} className="text-sm text-gray-400 hover:text-black">← 이전</button>
+        </div>
+      )}
+
+      {/* Step 4: 압류·세금 체납 */}
+      {step === 4 && (
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs text-gray-400 font-medium mb-1">Step 5</p>
+            <h2 className="text-xl font-black">추가 위험 항목 확인</h2>
+            <p className="text-sm text-gray-400 mt-1">모르면 &apos;모름&apos;을 선택해도 돼요</p>
+          </div>
+          <div className="space-y-3">
+            {([
+              { key: 'hasSeizure' as const, emoji: '🚨', label: '압류·가압류 이력이 있어요', desc: '등기부 을구에서 확인 가능해요' },
+              { key: 'hasTax' as const, emoji: '📋', label: '집주인 세금 체납이 의심돼요', desc: '세무서 무료 미납국세 열람으로 확인해요' },
+            ] as const).map(opt => (
+              <div key={opt.key} className="bg-white border border-gray-100 rounded-2xl p-4">
+                <p className="text-sm font-bold mb-1">{opt.emoji} {opt.label}</p>
+                <p className="text-xs text-gray-400 mb-3">{opt.desc}</p>
+                <div className="flex gap-2">
+                  {([{ label: '예', v: true as boolean | null }, { label: '아니요', v: false as boolean | null }, { label: '모름', v: null as boolean | null }]).map(btn => (
+                    <button
+                      key={btn.label}
+                      onClick={() => setData(d => ({ ...d, [opt.key]: btn.v }))}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                        data[opt.key] === btn.v ? 'bg-black text-white border-black' : 'border-gray-200 hover:border-black'
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={next}
+            className="w-full bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 transition-colors"
+          >
+            다음
+          </button>
+          <button onClick={back} className="text-sm text-gray-400 hover:text-black">← 이전</button>
+        </div>
+      )}
+
+      {/* Step 5: 주소 아는지 */}
+      {step === 5 && (
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs text-gray-400 font-medium mb-1">Step 6</p>
             <h2 className="text-xl font-black">주소를 알고 계신가요?</h2>
             <p className="text-sm text-gray-400 mt-1">주소를 알면 위험도를 더 정확하게 분석할 수 있어요</p>
           </div>
